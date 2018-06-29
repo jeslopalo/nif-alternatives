@@ -90,6 +90,8 @@ class Main
     values= event.to_hash
 
     if values[:alternativas]
+      puts "\nCalculando las diferentes variaciones del nif '#{candidate}'..."
+
       puts '╔═════════════════════════════════════╦╦══════════════════════╦════════════╦════════════╦════════════╗'
       printf "║ %35s ║║ %20s ║ %10s ║ %10s ║ %10s ║\n", 'NIF', 'NORMALIZADO', 'PREFIJO', 'DIGITOS', 'CONTROL'
       puts '╠═════════════════════════════════════╬╬══════════════════════╬════════════╬════════════╬════════════╣'
@@ -111,6 +113,8 @@ class Main
       end
 
       puts '╚════════════════════════════════════════════════════════════════════════════════════════════════════╝'
+    else
+      puts "'#{candidate}' no tiene posibles alternativas o no parece un nif"
     end
 
   end
@@ -123,8 +127,6 @@ class Main
     end
 
     argv.each do |candidate|
-
-      puts "\nCalculando las diferentes variaciones del nif #{candidate}..."
 
       completed_event=@generator.generate Event.new({:nif => @generator.normalize(candidate)})
 
