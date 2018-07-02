@@ -1,4 +1,5 @@
-#!/usr/bin/env jruby --dev
+#!/usr/bin/env jruby 
+#--dev
 
 class Event
 
@@ -32,18 +33,20 @@ class NifAlternativesGenerator
   def combine(prefix, digits, crc)
     combinations=[]
 
-    combinations << prefix + digits if prefix != nil
-    combinations << digits if digits != nil
-    combinations << digits + crc if crc != nil
+    combinations << prefix + digits + crc if prefix && crc
+    combinations << prefix + digits if prefix
+    combinations << digits + crc if crc
+    combinations << digits if digits
   end
 
   def normalize(value)
-    value.gsub(/[^0-9a-z ]/i, '').upcase
+    value.gsub(/[^0-9a-z ]/i, '').upcase if value
   end
 
   def generate(event)
     source_value= normalize event.get(@source)
-    match= source_value.match(/(^[a-z]?)([0-9]{0,7}[1-9])([a-z]?$)/i)
+    # match= source_value.match(/(^[a-z]?)([0-9]{0,7}[1-9])([a-z]?$)/i)
+    match= source_value.match(/(?=.{2,9}$)(^[a-z]?)([0-9]{0,8}[1-9][0-9]{0,8})([a-z]?$)/i)
 
     if match && source_value.length <= NIF_MAX_LENGTH
 
@@ -101,9 +104,9 @@ class Main
       puts '╠════════════════════════════════════════════════════════════════════════════════════════════════════╣'
 
       if (values[:alternativas][:info][:prefijo].to_s.length + values[:alternativas][:info][:control].to_s.length) == 2
-        output = values[:alternativas][:combinaciones].each_slice(3).to_a
+        output = values[:alternativas][:combinaciones].each_slice(4).to_a
         output.each do |x|
-          printf "║ %32s %32s %32s ║\n", *(x.fill('', x.length...3))
+          printf "║  %23s %23s %23s %23s   ║\n", *(x.fill('', x.length...4))
         end
       else
         output = values[:alternativas][:combinaciones].each_slice(2).to_a
